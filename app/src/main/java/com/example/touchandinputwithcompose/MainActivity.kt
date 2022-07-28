@@ -16,8 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.touchandinputwithcompose.ui.theme.TouchAndInputWithComposeTheme
@@ -40,6 +42,7 @@ class MainActivity : ComponentActivity() {
                                 item { DragByDraggable() }
                                 item { DragByPointerInput() }
                                 item { Scrollable() }
+                                item { Swipeable() }
                         })
                     }
                 )
@@ -101,8 +104,8 @@ fun DragByDraggable() {
             .draggable(
                 state = state,
                 orientation = Orientation.Horizontal,
-                onDragStarted = { Log.i(TAG,"drag started") },
-                onDragStopped = { Log.i(TAG,"drag stopped") }
+                onDragStarted = { Log.i(TAG, "drag started") },
+                onDragStopped = { Log.i(TAG, "drag stopped") }
             )
     ){
         Text(
@@ -125,7 +128,7 @@ fun DragByPointerInput() {
             .height(400.dp)
             .padding(all = 10.dp)
             .background(Color.Gray)
-            .pointerInput(Unit){
+            .pointerInput(Unit) {
                 detectDragGestures { change, dragAmount ->
                     x = dragAmount.x
                     y = dragAmount.y
@@ -166,6 +169,38 @@ fun Scrollable() {
                 ),
             textAlign = TextAlign.Center ,
             fontSize = 20.sp
+        )
+    }
+}
+
+enum class States { LEFT, RIGHT }
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun Swipeable() {
+    val width = 300.dp
+    val squareSize = 100.dp
+    val swipeableState = rememberSwipeableState(States.LEFT)
+    val squareSizePx = with(LocalDensity.current) {
+        (width-squareSize).toPx()
+    }
+    Box(
+        modifier = Modifier
+            .width(width)
+            .swipeable(
+                state = swipeableState,
+                anchors =  mapOf(0f to States.LEFT, squareSizePx to States.RIGHT),
+                thresholds = { _, _ -> FractionalThreshold(0.5f) },
+                orientation = Orientation.Horizontal
+            )
+            .background(Color.LightGray)
+    ) {
+        Box(
+            modifier = Modifier
+                .offset {
+                    IntOffset(swipeableState.offset.value.toInt(), 0)
+                }
+                .size(squareSize)
+                .background(Color.DarkGray)
         )
     }
 }
