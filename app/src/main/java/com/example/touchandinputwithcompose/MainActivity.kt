@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.touchandinputwithcompose.ui.theme.TouchAndInputWithComposeTheme
 const val TAG = "tag"
 class MainActivity : ComponentActivity() {
@@ -38,6 +39,7 @@ class MainActivity : ComponentActivity() {
                                 item { Click() }
                                 item { DragByDraggable() }
                                 item { DragByPointerInput() }
+                                item { Scrollable() }
                         })
                     }
                 )
@@ -135,6 +137,35 @@ fun DragByPointerInput() {
             modifier = Modifier
                 .width(100.dp)
                 .background(Color.White)
+        )
+    }
+}
+
+@Composable
+fun Scrollable() {
+    var value by remember{ mutableStateOf(0f)}
+    val scrollableState = rememberScrollableState(
+        consumeScrollDelta = {
+                delta -> value = delta
+                0f
+        }
+    )
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(50.dp)
+            .padding(all = 10.dp)
+            .background(Color.Gray)
+    ){
+        Text(
+            text = "Scrolled $value " ,
+            modifier = Modifier
+                .scrollable(
+                    state = scrollableState,
+                    orientation = Orientation.Vertical
+                ),
+            textAlign = TextAlign.Center ,
+            fontSize = 20.sp
         )
     }
 }
