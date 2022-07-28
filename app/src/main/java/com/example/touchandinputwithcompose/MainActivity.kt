@@ -13,7 +13,9 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -43,6 +45,7 @@ class MainActivity : ComponentActivity() {
                                 item { DragByPointerInput() }
                                 item { Scrollable() }
                                 item { Swipeable() }
+                                item { Transformable() }
                         })
                     }
                 )
@@ -188,7 +191,7 @@ fun Swipeable() {
             .width(width)
             .swipeable(
                 state = swipeableState,
-                anchors =  mapOf(0f to States.LEFT, squareSizePx to States.RIGHT),
+                anchors = mapOf(0f to States.LEFT, squareSizePx to States.RIGHT),
                 thresholds = { _, _ -> FractionalThreshold(0.5f) },
                 orientation = Orientation.Horizontal
             )
@@ -203,4 +206,35 @@ fun Swipeable() {
                 .background(Color.DarkGray)
         )
     }
+}
+
+@Composable
+fun Transformable() {
+    var scale by remember { mutableStateOf(1f) }
+    var rotation by remember { mutableStateOf(0f) }
+    var offset by remember { mutableStateOf(Offset.Zero) }
+    val state = rememberTransformableState {
+            zoomChange, offsetChange, rotationChange ->
+        scale *= zoomChange
+        rotation += rotationChange
+        offset += offsetChange
+    }
+
+    Box(modifier = Modifier.fillMaxWidth().height(500.dp)) {
+        Box(
+            modifier = Modifier
+                .graphicsLayer(
+                    scaleX = scale,
+                    scaleY = scale,
+                    rotationZ = rotation,
+                    translationX = offset.x,
+                    translationY = offset.y
+                )
+                .transformable(state = state)
+                .background(Color.Blue)
+                .fillMaxSize()
+        )
+    }
+
+
 }
